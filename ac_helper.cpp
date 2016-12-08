@@ -1,16 +1,59 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
-bool SvrCoreAppImpl::LoadFuckPingbi(string path)
+using namespace std;
+
+extern "C"{
+
+#include "aho_corasick.h"
+}
+
+AC_AUTOMATA *g_aca;
+char *g_fuck_pingbi = NULL;
+//m_aca = new AC_AUTOMATA;
+
+
+int match_handler(MATCH *m, void *param)
 {
-	std::cout << "Load  _fuck_pingbi.txt ING" << std::endl;
-	if(m_fuck_pingbi != NULL)
-	{
-		free(m_fuck_pingbi);
-		ac_automata_release(m_aca);
-		delete m_aca;
-		//3?¨º??¡¥AC¡Á??¡¥?¨²
-		m_aca = new AC_AUTOMATA;
-		ac_automata_init (m_aca, &match_handler);
+	int pos;
+	pos = m->position - m->matched_strings->length;
+	ac_automata_param *p = (ac_automata_param*)param;
+	for (; pos < m->position; pos++) {
+		p->str[pos] = '*';
 	}
+	p->ret = true;
+
+	return 0;
+}
+
+
+struct __AC_AUTOMATA
+{
+	__AC_AUTOMATA()
+	{
+		g_aca = new AC_AUTOMATA;
+		ac_automata_init(g_aca, &match_handler);
+	}
+
+	~__AC_AUTOMATA()
+	{
+		free(g_fuck_pingbi);
+		ac_automata_release(g_aca);
+	}
+}__AC_AUTOMATA;
+
+bool LoadFuckPingbi(string path)
+{
+
+	std::cout << "Load  _fuck_pingbi.txt ING" << std::endl;
+	if(g_fuck_pingbi != NULL)
+	{
+		free(g_fuck_pingbi);
+		ac_automata_release(g_aca);
+		delete g_aca;
+	}
+
 
 	path += "_fuck_pingbi.txt";
 	std::ifstream file(path.c_str(),std::ios::in | std::ios::binary);
@@ -30,52 +73,70 @@ bool SvrCoreAppImpl::LoadFuckPingbi(string path)
 
 	file.close(); 
 	len = str.length() + 1;
-	m_fuck_pingbi = (char *)malloc(len * sizeof(char *));
-	//?¨¨¡¤???¨°???¡ê?2¡é¨ª3????¨ºy
+	g_fuck_pingbi = (char *)malloc(len * sizeof(char *));
 	for(i = 0; i < len; ++i)
 	{
 		if(strchr("\r\n", str.c_str()[i]))
 		{
-			m_fuck_pingbi[i] = 0;
+			g_fuck_pingbi[i] = 0;
 			count++;
 		}
 		else
-			m_fuck_pingbi[i] = str.c_str()[i];
-	}
-	//?a??--??2????¨®??¡ê??¨¦?¨¹o¨®???1?¨¤¨°?DD??DD?¡ê
-	//2?1y?¨®¨¢?¨°22?¨®¡ã?¨¬?¨¢1?
-	barGoLink bg(--count);
-	//?¨®¦Ì??¨¢¡À?¡Á¨¦?t?D?¡ê
+			g_fuck_pingbi[i] = str.c_str()[i];
+	}	//?a??--??2????æ‡ˆèŠ¯??æ–œè¤—??æ‡ˆå¸?æ‡ˆéˆºî–µæ‡ˆèŠ¯???1?æ‡ˆå†™æ‡ˆéˆ»?DD??DD?æ–œè¤—
+	//2?1y?æ‡ˆèŠ¯æ‡ˆèƒ?æ‡ˆéˆ»?2?æ‡ˆèŠ¯æ–œè¤?æ‡ˆå±‘?æ‡ˆèƒ1?
+
+	//barGoLink bg(--count);
+
+	//?æ‡ˆèŠ¯å¸éˆº??æ‡ˆèƒæ–œéˆ¹?æ–œéˆ¹è‘±æ„Ÿ?t?D?æ–œè¤—
 	for (i = 0; i < len; ++i)
 	{
-		if(m_fuck_pingbi[i] == 0)
+		if(g_fuck_pingbi[i] == 0)
 		{
 			if(start != i)
 			{
 				tmp_str.id = id++;
-				tmp_str.str = (ALPHA *)(m_fuck_pingbi + start);
+				tmp_str.str = (ALPHA *)(g_fuck_pingbi + start);
 				tmp_str.length = i - start;
-				ac_automata_add_string(m_aca, &tmp_str);
-				bg.step();
+				ac_automata_add_string(g_aca, &tmp_str);
+				//bg.step();
 			}
 			start = i + 1;
 		}
 	}
-	ac_automata_locate_failure (m_aca);
+	ac_automata_locate_failure (g_aca);
 	//std::cout << "Load  _fuck_pingbi.txt OK!" << std::endl;
 	return true;
 }
 
-bool SvrCoreAppImpl::FuckPingbi(char* str)
+char* FuckPingbi(char* str)
 {
-	ASSERT(m_config.load_pingbi);
+	static char pinbi_buff[8096];
+	//memset(pinbi_buff, 0, 8096);
+	strcpy(pinbi_buff, str);
+	//ASSERT(m_config.load_pingbi);
 	STRING tmp_str;
-	tmp_str.str = str;
+	tmp_str.str = pinbi_buff;
 	tmp_str.length = strlen(tmp_str.str);
 	ac_automata_param param;
-	param.str = str;
-	param.ret = FALSE;
-	ac_automata_search (m_aca, &tmp_str, &param);
-	ac_automata_reset(m_aca);
-	return param.ret != 0;
+	param.str = pinbi_buff;
+	param.ret = false;
+	ac_automata_search (g_aca, &tmp_str, &param);
+	ac_automata_reset(g_aca);
+	if (param.ret !=0 )
+		return pinbi_buff;
+	return NULL;
+}
+
+
+void Test()
+{
+	string path = "E:\\snake\\pingbi\\";
+	LoadFuckPingbi(path);
+	char* pinbi = (char*)malloc(13);// "a493664527h";
+	memset(pinbi,0,13);
+	const char* pb = "a493664527h";
+	memcpy(pinbi, pb,strlen(pb));
+	char* res = FuckPingbi(pinbi);
+	std::cout << res << std::endl;
 }
