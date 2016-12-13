@@ -4,7 +4,7 @@ local ffi_new = ffi.new
 local ffi_free = ffi.free
 local ffi_gc = ffi.gc
 local ffi_string = ffi.string
-local libahocorasick = ffi_load("ahocorasick/libahocorasick")
+local libahocorasick = ffi_load("libahocorasick")
 
 
 --from ac_helper.cpp
