@@ -1,9 +1,5 @@
 local ffi = require("ffi")
 local ffi_load = require("ahocorasick.ffi_load").load
-local ffi_new = ffi.new
-local ffi_free = ffi.free
-local ffi_gc = ffi.gc
-local ffi_string = ffi.string
 local libahocorasick = ffi_load("libahocorasick")
 
 
@@ -22,10 +18,10 @@ local function Load (s)
 end
 
 local function Pingbi(s)
-	local temp = ffi_gc( ffi_new("char[1024]"), ffi_free)
+	local temp = ffi.gc( ffi.new("char[1024]"), ffi.free)
 	ffi.copy(temp, s)
     local ret = libahocorasick.FuckPingbi(temp)
-    return ffi_string(temp)
+    return ffi.string(temp)
 end
 
 return {Load = Load, Pingbi = Pingbi}
