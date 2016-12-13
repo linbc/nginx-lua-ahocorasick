@@ -38,8 +38,13 @@ struct __AC_AUTOMATA
 
 	~__AC_AUTOMATA()
 	{
-		free(g_fuck_pingbi);
-		ac_automata_release(g_aca);
+		if (g_fuck_pingbi!=NULL) 
+			free(g_fuck_pingbi);
+		if (g_aca != NULL)
+		{
+			ac_automata_release(g_aca);
+			delete g_aca;
+		}
 	}
 }__AC_AUTOMATA;
 
@@ -52,6 +57,9 @@ bool LoadFuckPingbi(string path)
 		free(g_fuck_pingbi);
 		ac_automata_release(g_aca);
 		delete g_aca;
+
+		g_aca = new AC_AUTOMATA;
+		ac_automata_init(g_aca, &match_handler);
 	}
 
 
@@ -132,6 +140,7 @@ char* FuckPingbi(char* str)
 void Test()
 {
 	string path = "E:\\snake\\pingbi\\";
+	LoadFuckPingbi(path);
 	LoadFuckPingbi(path);
 	char* pinbi = (char*)malloc(13);// "a493664527h";
 	memset(pinbi,0,13);
