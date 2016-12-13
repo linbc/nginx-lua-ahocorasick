@@ -112,7 +112,7 @@ extern "C" int LoadFuckPingbi(const char* cpath)
 
 extern "C" const char* FuckPingbi(const char* str)
 {
-	static char pinbi_buff[8096];
+	char *pinbi_buff = (char*)malloc(4096);
 	//memset(pinbi_buff, 0, 8096);
 	strcpy(pinbi_buff, str);
 	//ASSERT(m_config.load_pingbi);
@@ -132,20 +132,9 @@ extern "C" const char* FuckPingbi(const char* str)
 
 void Test()
 {
-<<<<<<< HEAD
-	string path = "E:\\snake\\pingbi\\";
-	LoadFuckPingbi(path);
-	LoadFuckPingbi(path);
-	char* pinbi = (char*)malloc(13);// "a493664527h";
-	memset(pinbi,0,13);
-	const char* pb = "a493664527h";
-	memcpy(pinbi, pb,strlen(pb));
-	char* res = FuckPingbi(pinbi);
-=======
 	string path = "..\\_fuck_pingbi.txt";
 	LoadFuckPingbi(path.c_str());
 	char pinbi[1024] = "a493664527h";
 	const char* res = FuckPingbi(pinbi);
->>>>>>> 9074583d22903633439acf923911a0cea2725c4d
 	std::cout << res << std::endl;
 }
