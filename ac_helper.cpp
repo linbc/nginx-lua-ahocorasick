@@ -1,11 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdlib.h>
+#include <string.h>
 
 using namespace std;
 
-extern "C"{
-
+extern "C" {
 #include "aho_corasick.h"
 }
 
@@ -48,10 +49,8 @@ struct __AC_AUTOMATA
 	}
 }__AC_AUTOMATA;
 
-bool LoadFuckPingbi(string path)
+extern "C" int LoadFuckPingbi(const char* cpath)
 {
-
-	std::cout << "Load  _fuck_pingbi.txt ING" << std::endl;
 	if(g_fuck_pingbi != NULL)
 	{
 		free(g_fuck_pingbi);
@@ -62,13 +61,11 @@ bool LoadFuckPingbi(string path)
 		ac_automata_init(g_aca, &match_handler);
 	}
 
-
-	path += "_fuck_pingbi.txt";
-	std::ifstream file(path.c_str(),std::ios::in | std::ios::binary);
+	std::ifstream file(cpath,std::ios::in | std::ios::binary);
 	if(!file)
 	{
 		std::cout << "LoadFuckPingbi fail" << std::endl;
-		return false;
+		return -1;
 	}
 
 	unsigned int i = 0, id = 1, start = 0, count  =0, len;	
@@ -91,12 +88,8 @@ bool LoadFuckPingbi(string path)
 		}
 		else
 			g_fuck_pingbi[i] = str.c_str()[i];
-	}	//?a??--??2????懈芯??斜褗??懈卸?懈鈺懈芯???1?懈写懈鈻?DD??DD?斜褗
-	//2?1y?懈芯懈胁?懈鈻?2?懈芯斜褍?懈屑?懈胁1?
-
-	//barGoLink bg(--count);
-
-	//?懈芯卸鈺??懈胁斜鈹?斜鈹葱感?t?D?斜褗
+	}	
+	
 	for (i = 0; i < len; ++i)
 	{
 		if(g_fuck_pingbi[i] == 0)
@@ -114,10 +107,10 @@ bool LoadFuckPingbi(string path)
 	}
 	ac_automata_locate_failure (g_aca);
 	//std::cout << "Load  _fuck_pingbi.txt OK!" << std::endl;
-	return true;
+	return 0;
 }
 
-char* FuckPingbi(char* str)
+extern "C" const char* FuckPingbi(const char* str)
 {
 	static char pinbi_buff[8096];
 	//memset(pinbi_buff, 0, 8096);
@@ -139,6 +132,7 @@ char* FuckPingbi(char* str)
 
 void Test()
 {
+<<<<<<< HEAD
 	string path = "E:\\snake\\pingbi\\";
 	LoadFuckPingbi(path);
 	LoadFuckPingbi(path);
@@ -147,5 +141,11 @@ void Test()
 	const char* pb = "a493664527h";
 	memcpy(pinbi, pb,strlen(pb));
 	char* res = FuckPingbi(pinbi);
+=======
+	string path = "..\\_fuck_pingbi.txt";
+	LoadFuckPingbi(path.c_str());
+	char pinbi[1024] = "a493664527h";
+	const char* res = FuckPingbi(pinbi);
+>>>>>>> 9074583d22903633439acf923911a0cea2725c4d
 	std::cout << res << std::endl;
 }
