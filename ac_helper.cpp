@@ -112,8 +112,8 @@ extern "C" int LoadFuckPingbi(const char* cpath)
 
 extern "C" const char* FuckPingbi(const char* str)
 {
-	char *pinbi_buff = (char*)malloc(4096);
-	//memset(pinbi_buff, 0, 8096);
+	static char pinbi_buff[4096];
+	memset(pinbi_buff, 0, 4096);
 	strcpy(pinbi_buff, str);
 	//ASSERT(m_config.load_pingbi);
 	STRING tmp_str;

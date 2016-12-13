@@ -1,7 +1,7 @@
 local ffi = require("ffi")
 local ffi_load = require("ahocorasick.ffi_load").load
 local ffi_string = ffi.string
-local libahocorasick = ffi_load("ahocorasick/libahocorasick")
+local libahocorasick = ffi_load("libahocorasick")
 
 
 --from ac_helper.cpp
