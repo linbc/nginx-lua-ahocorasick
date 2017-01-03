@@ -6,6 +6,24 @@
 
 static CIpFinder g_ipFinder;
 
+
+bool InitIpFinder(const char *pszFileName)
+{
+	bool ret = g_ipFinder.Open(pszFileName);
+	return ret;
+}
+
+const char* GetAddressByIp(const char* pszIp)
+{
+	std::string strCountry;
+	std::string strLocation;
+	g_ipFinder.GetAddressByIp(pszIp, strCountry, strLocation);
+	return strCountry.c_str();
+}
+
+
+
+
 // ============================================================================
 // ==============================================================================
 CIpFinder::CIpFinder():m_fpIpDataFile(0)
