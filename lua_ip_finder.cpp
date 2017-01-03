@@ -4,6 +4,106 @@
 
 
 
+
+#ifndef WIN32
+#include <iconv.h>
+
+struct iconv_u2g_t{
+	iconv_u2g_t()
+	{
+		cd = iconv_open("GBK","UTF-8");
+		ASSERT(cd != 0);
+	}
+	~iconv_u2g_t()
+	{
+		iconv_close(cd);
+	}
+
+	int conv(const char *inbuf,size_t inlen,char *outbuf,size_t outlen)
+	{
+		char **pin = (char **)&inbuf;
+		size_t *pinlen = & inlen;
+		memset(outbuf,0,outlen);
+		if (iconv(cd,pin,pinlen,&outbuf,&outlen) == -1) 
+			return -1;
+		return 0;
+	}	
+	bool conv(string instr,string& outstr)
+	{
+		static char out_buf[4096];
+		if(conv(instr.c_str(),instr.size(),out_buf,4096))
+			return false;
+		outstr = out_buf;
+		return true;
+	}
+	const char* conv(const char* input)
+	{
+		static char out_buf[4096];
+		if(conv(input,strlen(input)+1,out_buf,4096))
+			return "";
+		return out_buf;
+	}
+private:
+	iconv_t cd;
+}iconv_u2g;
+
+//GB2312 ×ª³É UTF8
+struct iconv_g2u_t{
+	iconv_g2u_t()
+	{
+		cd = iconv_open("UTF-8","GBK");
+		ASSERT(cd != 0);
+	}
+	~iconv_g2u_t()
+	{
+		iconv_close(cd);
+	}
+
+	int conv(const char *inbuf,size_t inlen,char *outbuf,size_t outlen)
+	{
+		char **pin = (char **)&inbuf;
+		size_t *pinlen = & inlen;
+		memset(outbuf,0,outlen);
+		if (iconv(cd,pin,pinlen,&outbuf,&outlen) == -1) 
+			return -1;
+		return 0;
+	}	
+	bool conv(string instr,string& outstr)
+	{
+		static char out_buf[4096];
+		if(conv(instr.c_str(),instr.size(),out_buf,4096))
+			return false;
+		outstr = out_buf;
+		return true;
+	}
+	const char* conv(const char* input)
+	{
+		static char out_buf[4096];
+		if(conv(input,strlen(input)+1,out_buf,4096))
+			return "";
+		return out_buf;
+	}
+private:
+	iconv_t cd;
+}iconv_g2u;
+#endif
+
+
+
+
+bool consoleToUtf8(const std::string& conStr, std::string& utf8str)
+{
+#if PLATFORM == PLATFORM_WINDOWS
+	//std::wstring wstr;
+	//wstr.resize(conStr.size());
+	//OemToCharBuffW(&conStr[0], &wstr[0], conStr.size());
+
+	return false;// WStrToUtf8(wstr, utf8str);
+#else
+	return iconv_g2u.conv(conStr, utf8str);
+#endif
+}
+
 static CIpFinder g_ipFinder;
 
 
@@ -17,8 +117,11 @@ extern "C" int GetAddressByIp(const char* pszIp,char* country)
 {
 	std::string strCountry;
 	std::string strLocation;
+	std::string strCountry_utf8;
 	g_ipFinder.GetAddressByIp(pszIp, strCountry, strLocation);
-	strcpy(country, strCountry.c_str()); //strCountry
+	
+	consoleToUtf8(strCountry, strCountry_utf8);
+	strcpy(country, strCountry_utf8.c_str()); //strCountry
 	return 0;//strCountry.c_str();
 }
 
