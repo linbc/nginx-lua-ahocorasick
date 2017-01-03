@@ -13,14 +13,13 @@ extern "C" int InitIpFinder(const char *pszFileName)
 	return (int)ret;
 }
 
-extern "C" char* GetAddressByIp(const char* pszIp)
+extern "C" int GetAddressByIp(const char* pszIp,char* country)
 {
 	std::string strCountry;
 	std::string strLocation;
 	g_ipFinder.GetAddressByIp(pszIp, strCountry, strLocation);
-	char country[1024] = "";
 	strcpy(country, strCountry.c_str()); //strCountry
-	return country;//strCountry.c_str();
+	return 0;//strCountry.c_str();
 }
 
 
