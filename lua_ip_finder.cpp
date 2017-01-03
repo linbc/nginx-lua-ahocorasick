@@ -7,13 +7,13 @@
 static CIpFinder g_ipFinder;
 
 
-bool InitIpFinder(const char *pszFileName)
+extern "C" int InitIpFinder(const char *pszFileName)
 {
 	bool ret = g_ipFinder.Open(pszFileName);
-	return ret;
+	return (int)ret;
 }
 
-const char* GetAddressByIp(const char* pszIp)
+extern "C" const char* GetAddressByIp(const char* pszIp)
 {
 	std::string strCountry;
 	std::string strLocation;
