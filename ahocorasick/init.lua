@@ -1,7 +1,6 @@
 local ffi = require("ffi")
 local ffi_load = require("ahocorasick.ffi_load").load
-local ffi_string = ffi.string
-local libahocorasick = ffi_load("ahocorasick/libahocorasick")
+local libahocorasick = ffi_load("libahocorasick")
 
 
 --from ac_helper.cpp
@@ -9,7 +8,7 @@ ffi.cdef[[
 
 	int LoadFuckPingbi(const char* cpath);
 
-	const char* FuckPingbi(const char* str);
+	const int FuckPingbi(char* pinbi_buff);
 
 ]]
 
@@ -19,8 +18,10 @@ local function Load (s)
 end
 
 local function Pingbi(s)
-    local ret = libahocorasick.FuckPingbi(s)
-    return ret and ffi_string(ret) or nil
+	local temp = ffi.gc( ffi.new("char[1024]"), ffi.free)
+	ffi.copy(temp, s)
+    local ret = libahocorasick.FuckPingbi(temp)
+    return ffi.string(temp)
 end
 
 return {Load = Load, Pingbi = Pingbi}

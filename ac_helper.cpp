@@ -110,42 +110,26 @@ extern "C" int LoadFuckPingbi(const char* cpath)
 	return 0;
 }
 
-extern "C" const char* FuckPingbi(const char* str)
-{
-	static char pinbi_buff[8096];
-	//memset(pinbi_buff, 0, 8096);
-	strcpy(pinbi_buff, str);
-	//ASSERT(m_config.load_pingbi);
+extern "C" int FuckPingbi(char* pinbi_buff)
+{	
 	STRING tmp_str;
 	tmp_str.str = pinbi_buff;
 	tmp_str.length = strlen(tmp_str.str);
+	
 	ac_automata_param param;
 	param.str = pinbi_buff;
 	param.ret = false;
 	ac_automata_search (g_aca, &tmp_str, &param);
 	ac_automata_reset(g_aca);
-	if (param.ret !=0 )
-		return pinbi_buff;
-	return NULL;
+	return param.ret;
 }
 
 
 void Test()
 {
-//<<<<<<< HEAD
-//	string path = "E:\\snake\\pingbi\\";
-//	LoadFuckPingbi(path);
-//	LoadFuckPingbi(path);
-//	char* pinbi = (char*)malloc(13);// "a493664527h";
-//	memset(pinbi,0,13);
-//	const char* pb = "a493664527h";
-//	memcpy(pinbi, pb,strlen(pb));
-//	char* res = FuckPingbi(pinbi);
-//=======
 	string path = "..\\_fuck_pingbi.txt";
 	LoadFuckPingbi(path.c_str());
 	char pinbi[1024] = "a493664527h";
-	const char* res = FuckPingbi(pinbi);
-//>>>>>>> 9074583d22903633439acf923911a0cea2725c4d
-	std::cout << res << std::endl;
+	int res = FuckPingbi(pinbi);
+	std::cout << pinbi << std::endl;
 }
