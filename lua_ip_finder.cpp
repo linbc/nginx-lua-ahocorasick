@@ -121,7 +121,7 @@ extern "C" int GetAddressByIp(const char* pszIp,char* country)
 	g_ipFinder.GetAddressByIp(pszIp, strCountry, strLocation);
 	
 	consoleToUtf8(strCountry, strCountry_utf8);
-	strcpy(country, strCountry.c_str()); //strCountry
+	strcpy(country, strCountry_utf8.c_str()); //strCountry
 	return 0;//strCountry.c_str();
 }
 
