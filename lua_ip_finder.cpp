@@ -52,7 +52,7 @@ struct iconv_g2u_t{
 	iconv_g2u_t()
 	{
 		cd = iconv_open("UTF-8","GBK");
-		ASSERT(cd != 0);
+		//ASSERT(cd != 0);
 	}
 	~iconv_g2u_t()
 	{
