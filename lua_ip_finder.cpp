@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
-
+using namespace std;
 
 
 #ifndef WIN32
@@ -12,7 +12,7 @@ struct iconv_u2g_t{
 	iconv_u2g_t()
 	{
 		cd = iconv_open("GBK","UTF-8");
-		ASSERT(cd != 0);
+		//ASSERT(cd != 0);
 	}
 	~iconv_u2g_t()
 	{
