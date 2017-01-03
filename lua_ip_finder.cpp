@@ -37,7 +37,7 @@ CIpFinder::~CIpFinder()
 	if(m_fpIpDataFile)
 	{
 		fclose(m_fpIpDataFile);
-		m_fpIpDataFile = nullptr;
+		m_fpIpDataFile = NULL;
 	}
 	
 }
