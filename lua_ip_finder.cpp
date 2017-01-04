@@ -93,13 +93,7 @@ private:
 
 bool consoleToUtf8(const std::string& conStr, std::string& utf8str)
 {
-#if PLATFORM == PLATFORM_WINDOWS
-	//std::wstring wstr;
-	//wstr.resize(conStr.size());
-	//OemToCharBuffW(&conStr[0], &wstr[0], conStr.size());
-
-	return false;// WStrToUtf8(wstr, utf8str);
-#else
+#ifndef WIN32
 	return iconv_g2u.conv(conStr, utf8str);
 #endif
 }
