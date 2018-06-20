@@ -44,7 +44,7 @@ build = {
             "DISABLE_INVALID_NUMBERS", "USE_INTERNAL_ISINF"
         } } } }
     },
-    copy_directories = { "tests" }
+--    copy_directories = { "tests" }
 }
 
 -- vi:ai et sw=4 ts=4:

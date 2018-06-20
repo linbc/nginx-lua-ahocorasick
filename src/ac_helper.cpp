@@ -8,6 +8,8 @@ using namespace std;
 
 extern "C" {
 #include "aho_corasick.h"
+#include <lua.h>
+#include <lauxlib.h>
 }
 
 AC_AUTOMATA *g_aca;
@@ -138,12 +140,12 @@ static int checkout_output(int newsize) {
 	
 	if (s_output_len == 0) {
 		s_output_len = newsize;
-		s_output = malloc(s_output_len);
+		s_output = (char*)malloc(s_output_len);
 	}
 	while (s_output_len < newsize) {
 		s_output_len = s_output_len << 1;
 	}
-	s_output = realloc(s_output, s_output_len);
+	s_output = (char*)realloc(s_output, s_output_len);
 	return 1;
 }
 
@@ -152,11 +154,11 @@ static int lua_load(lua_State *L) {
 	const char* path = luaL_checkstring(L, 1);
 	int ret = LoadPingbi(path);	
 	if(ret != 0) {
-		lua_pushboolean(L, FALSE);
+		lua_pushboolean(L, false);
 		lua_pushnumber(L, ret);
 		return 2;
 	} else {
-		lua_pushboolean(L, TRUE);
+		lua_pushboolean(L, true);
 		return 1;
 	}	
 }
@@ -170,10 +172,10 @@ static int lua_match(lua_State *L) {
 	
 	// 返回匹配结果
 	// 如果匹配上返回新值
-	if (FuckPingbi(s_output) != FALSE)
-		lua_pushboolean(L, TRUE);
+	if (FuckPingbi(s_output) != false)
+		lua_pushboolean(L, true);
 	else
-		lua_pushboolean(L, FALSE);
+		lua_pushboolean(L, false);
 	lua_pushstring(L, s_output);
 	return 2;
 }
@@ -191,11 +193,3 @@ extern "C" int luaopen_ahocorasick_binding(lua_State *L) {
 	return 0;
 }
 
-void Test()
-{
-	string path = "..\\_fuck_pingbi.txt";
-	LoadFuckPingbi(path.c_str());
-	char pinbi[1024] = "a493664527h";
-	int res = FuckPingbi(pinbi);
-	std::cout << pinbi << std::endl;
-}
