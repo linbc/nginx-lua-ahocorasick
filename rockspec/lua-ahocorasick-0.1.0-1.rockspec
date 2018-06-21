@@ -24,7 +24,7 @@ build = {
     type = "builtin",
     modules = {
         ahocorasick = {
-            sources = { "ac_mem_pool.c", "aho_corasick.c", "node.c", "ac_helper.cpp" },
+            sources = { "ac_mem_pool.c", "aho_corasick.c", "node.c", "lua_ahocorasick_binding.c" },
             defines = {
 -- LuaRocks does not support platform specific configuration for Solaris.
 -- Uncomment the line below on Solaris platforms if required.
