@@ -1,16 +1,13 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <stdlib.h>
 #include <string.h>
 
-using namespace std;
 
-extern "C" {
 #include "aho_corasick.h"
 #include <lua.h>
 #include <lauxlib.h>
-}
+
+#define TRUE 1
+#define FALSE 0
 
 AC_AUTOMATA *g_aca;
 char *g_fuck_pingbi = NULL;
@@ -25,7 +22,7 @@ int match_handler(MATCH *m, void *param)
 	for (; pos < m->position; pos++) {
 		p->str[pos] = '*';
 	}
-	p->ret = true;
+	p->ret = TRUE;
 
 	return 0;
 }
@@ -34,87 +31,66 @@ int match_handler(MATCH *m, void *param)
 static int s_output_len = 0;
 static char *s_output = NULL;
 
-struct __AC_AUTOMATA {
-	__AC_AUTOMATA() {
-		g_aca = new AC_AUTOMATA;
-		ac_automata_init(g_aca, &match_handler);
-	}
+static int AC_AUTOMATA_init(){
+    g_aca = (AC_AUTOMATA*)malloc(sizeof(*g_aca));
+    ac_automata_init(g_aca, &match_handler);
+}
 
-	~__AC_AUTOMATA() {
-		if (g_fuck_pingbi!=NULL) 
-			free(g_fuck_pingbi);
-		if (g_aca != NULL) {
-			ac_automata_release(g_aca);
-			delete g_aca;
-		}
-		if (s_output){
-			free(s_output);
-			s_output_len = 0;
-		}
-	}
-}__AC_AUTOMATA;
+static int AC_AUTOMATA_free(){
+    if (g_fuck_pingbi!=NULL) {
+        free(g_fuck_pingbi);
+        g_fuck_pingbi = NULL;
+    }
+    if (g_aca != NULL) {
+        ac_automata_release(g_aca);
+        free(g_aca);
+    }
+    if (s_output){
+        free(s_output);
+        s_output_len = 0;
+    }
+}
 
-extern "C" int LoadPingbi(const char* cpath)
+
+int LoadPingbi(const char* cpath)
 {
-	if(g_fuck_pingbi != NULL)
-	{
-		free(g_fuck_pingbi);
-		ac_automata_release(g_aca);
-		delete g_aca;
+	if(g_aca != NULL){
+        AC_AUTOMATA_free();
+        AC_AUTOMATA_init();
+    }
 
-		g_aca = new AC_AUTOMATA;
-		ac_automata_init(g_aca, &match_handler);
-	}
+	unsigned int size = 0, id = 1, start = 0, len;	
 
-	std::ifstream file(cpath,std::ios::in | std::ios::binary);
-	if(!file)
-	{
-		std::cout << "LoadFuckPingbi fail" << std::endl;
-		return -1;
-	}
+    //每行最大读取的字符数,可根据实际情况扩大
+    char line[1024];             
+    FILE *fp; 
+    //判断文件是否存在及可读
+    if((fp = fopen(cpath,"r")) == NULL) {
+        return -1;
+    }
+    while(!feof(fp)) {
+        // 读取一行
+        fgets(line, sizeof(line), fp);
+        len = strlen(line);
 
-	unsigned int i = 0, id = 1, start = 0, count  =0, len;	
-	STRING tmp_str;	
-    
-	std::stringstream buffer;
-	buffer << file.rdbuf();   
-	std::string str = buffer.str();  
-
-	file.close(); 
-	len = str.length() + 1;
-	g_fuck_pingbi = (char *)malloc(len * sizeof(char *));
-	for(i = 0; i < len; ++i)
-	{
-		if(strchr("\r\n", str.c_str()[i]))
-		{
-			g_fuck_pingbi[i] = 0;
-			count++;
-		}
-		else
-			g_fuck_pingbi[i] = str.c_str()[i];
-	}	
-	
-	for (i = 0; i < len; ++i)
-	{
-		if(g_fuck_pingbi[i] == 0)
-		{
-			if(start != i)
-			{
-				tmp_str.id = id++;
-				tmp_str.str = (ALPHA *)(g_fuck_pingbi + start);
-				tmp_str.length = i - start;
-				ac_automata_add_string(g_aca, &tmp_str);
-				//bg.step();
-			}
-			start = i + 1;
-		}
-	}
+        // 扩展内存
+        g_fuck_pingbi = (char*)realloc(g_fuck_pingbi, size + len + 1);
+        strcpy(g_fuck_pingbi + size, line);
+        size += len+1;
+        
+        // 加入字符串中
+	    static STRING tmp_str;	
+		tmp_str.id = id++;
+        tmp_str.str = (ALPHA *)line;
+        tmp_str.length = len; 
+        ac_automata_add_string(g_aca, &tmp_str);
+    }
+    fclose(fp);
 	ac_automata_locate_failure (g_aca);
-	//std::cout << "Load  _fuck_pingbi.txt OK!" << std::endl;
 	return 0;
 }
 
-extern "C" int FuckPingbi(char* pinbi_buff)
+int FuckPingbi(char* pinbi_buff)
 {
 	STRING tmp_str;
 	tmp_str.str = pinbi_buff;
@@ -122,7 +98,7 @@ extern "C" int FuckPingbi(char* pinbi_buff)
 	
 	ac_automata_param param;
 	param.str = pinbi_buff;
-	param.ret = false;
+	param.ret = FALSE;
 	ac_automata_search (g_aca, &tmp_str, &param);
 	ac_automata_reset(g_aca);
 	return param.ret;
@@ -148,21 +124,21 @@ static int checkout_output(int newsize) {
 	return 1;
 }
 
-static int lua_load(lua_State *L) {
+static int lua_ahocorasick_load(lua_State *L) {
 	// 传入路径名
 	const char* path = luaL_checkstring(L, 1);
 	int ret = LoadPingbi(path);	
 	if(ret != 0) {
-		lua_pushboolean(L, false);
+		lua_pushboolean(L, FALSE);
 		lua_pushnumber(L, ret);
 		return 2;
 	} else {
-		lua_pushboolean(L, true);
+		lua_pushboolean(L, TRUE);
 		return 1;
 	}	
 }
 
-static int lua_match(lua_State *L) {
+static int lua_ahocorasick_match(lua_State *L) {
 	// 传入文本
 	const char* str = luaL_checkstring(L, 1);
 	int len = strlen(str) + 1;
@@ -171,21 +147,21 @@ static int lua_match(lua_State *L) {
 	
 	// 返回匹配结果
 	// 如果匹配上返回新值
-	if (FuckPingbi(s_output) != false)
-		lua_pushboolean(L, true);
+	if (FuckPingbi(s_output) != FALSE)
+		lua_pushboolean(L, TRUE);
 	else
-		lua_pushboolean(L, false);
+		lua_pushboolean(L, FALSE);
 	lua_pushstring(L, s_output);
 	return 2;
 }
 
 static const struct luaL_reg _funcs[] = {
-	{ "load",				&lua_load },
-	{ "match",				&lua_match },
+	{ "load",				&lua_ahocorasick_load },
+	{ "match",				&lua_ahocorasick_match },
 	{ NULL, NULL }
 };
 
-extern "C" int luaopen_ahocorasick_binding(lua_State *L) {
+int luaopen_ahocorasick(lua_State *L) {
 	int startPos = lua_gettop(L);
 	luaL_openlib(L, "ahocorasick", _funcs, 0);
 	lua_settop(L, startPos);
