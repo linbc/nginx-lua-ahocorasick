@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 
 #include "aho_corasick.h"
-#include <lua.h>
-#include <lauxlib.h>
 
+#define BOOL int
 #define TRUE 1
 #define FALSE 0
 
@@ -51,15 +51,15 @@ static int AC_AUTOMATA_free(){
     }
 }
 
-
 int LoadPingbi(const char* cpath)
 {
 	if(g_aca != NULL){
-        AC_AUTOMATA_free();
-        AC_AUTOMATA_init();
+        AC_AUTOMATA_free();        
     }
+	AC_AUTOMATA_init();
 
 	unsigned int size = 0, id = 1, start = 0, len;	
+	char *dump_str;
 
     //每行最大读取的字符数,可根据实际情况扩大
     char line[1024];             
@@ -68,20 +68,29 @@ int LoadPingbi(const char* cpath)
     if((fp = fopen(cpath,"r")) == NULL) {
         return -1;
     }
+	g_fuck_pingbi = (char*)malloc(1);
     while(!feof(fp)) {
         // 读取一行
         fgets(line, sizeof(line), fp);
         len = strlen(line);
 
+		// 末尾总是有一个换行,所以还是处理一下吧.
+		if(line[len] == '\n') {
+			line[len] = '\0';
+			len -= 1;
+		}
+
         // 扩展内存
         g_fuck_pingbi = (char*)realloc(g_fuck_pingbi, size + len + 1);
-        strcpy(g_fuck_pingbi + size, line);
-        size += len+1;
+		dump_str = g_fuck_pingbi + size;
+		size += len + 1;
+
+        strcpy(dump_str, line);        
         
         // 加入字符串中
 	    static STRING tmp_str;	
 		tmp_str.id = id++;
-        tmp_str.str = (ALPHA *)line;
+        tmp_str.str = (ALPHA *)dump_str;
         tmp_str.length = len; 
         ac_automata_add_string(g_aca, &tmp_str);
     }
@@ -90,7 +99,7 @@ int LoadPingbi(const char* cpath)
 	return 0;
 }
 
-int FuckPingbi(char* pinbi_buff)
+BOOL FuckPingbi(char* pinbi_buff)
 {
 	STRING tmp_str;
 	tmp_str.str = pinbi_buff;
@@ -105,7 +114,9 @@ int FuckPingbi(char* pinbi_buff)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-
+#if 1
+#include <lua.h>
+#include <lauxlib.h>
 
 //如果缓冲区太小则扩大
 static int checkout_output(int newsize) {
@@ -141,9 +152,9 @@ static int lua_ahocorasick_load(lua_State *L) {
 static int lua_ahocorasick_match(lua_State *L) {
 	// 传入文本
 	const char* str = luaL_checkstring(L, 1);
-	int len = strlen(str) + 1;
+	//int len = strlen(str) + 1;
 	checkout_output(len);	
-	memcpy(s_output, str, len);
+	strcpy(s_output, str);
 	
 	// 返回匹配结果
 	// 如果匹配上返回新值
@@ -168,3 +179,4 @@ int luaopen_ahocorasick(lua_State *L) {
 	return 0;
 }
 
+#endif

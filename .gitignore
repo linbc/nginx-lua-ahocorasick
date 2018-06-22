@@ -11,3 +11,4 @@
 *.so
 
 *.dat
+/src/win32

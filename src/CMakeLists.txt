@@ -16,7 +16,7 @@ include_directories(
    ${CMAKE_CURRENT_SOURCE_DIR}/
 )
 
-add_library(ahocorasick SHARED ${ahocorasick_STAT_SRCS})
-#add_executable(ahocorasick ${ahocorasick_STAT_SRCS})
+#add_library(ahocorasick SHARED ${ahocorasick_STAT_SRCS})
+add_executable(ahocorasick ${ahocorasick_STAT_SRCS})
 SET_TARGET_PROPERTIES(ahocorasick PROPERTIES LINKER_LANGUAGE C)
 
