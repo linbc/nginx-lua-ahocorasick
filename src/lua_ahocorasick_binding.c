@@ -174,7 +174,7 @@ static int lua_ahocorasick_load(lua_State *L) {
 static int lua_ahocorasick_match(lua_State *L) {
 	// 传入文本
 	const char* str = luaL_checkstring(L, 1);
-	//int len = strlen(str) + 1;
+	int len = strlen(str) + 1;
 	checkout_output(len);	
 	strcpy(s_output, str);
 	
