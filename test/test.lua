@@ -1,6 +1,6 @@
-local libahocorasick = require 'ahocorasick'
+require 'ahocorasick'
 
-local ret = libahocorasick.Load('_fuck_pingbi.txt')
+local ret = ahocorasick.load('_fuck_pingbi.txt')
 print(ret)
-print(libahocorasick.Pingbi('a493664527h'))
+print(ahocorasick.match('a西藏自由h'))
 
