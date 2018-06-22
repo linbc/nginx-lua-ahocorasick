@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
+#include <assert.h>
 
 #include "aho_corasick.h"
 
@@ -51,6 +51,25 @@ static int AC_AUTOMATA_free(){
     }
 }
 
+static int get_line(char* buffer, int buffer_size, FILE* f) {
+	int count = 0;
+	char ch;
+	do
+	{
+		ch = fgetc(f);
+		if (ch == '\r' || ch == '\n') {
+			buffer[count] = '\0';
+			return count;
+		} else {
+			buffer[count++] = ch;
+			assert(count < buffer_size);
+		}
+	} while (ch != EOF);
+	if(ch == EOF) 
+		buffer[count] = '\0';
+	return count;
+}
+
 int LoadPingbi(const char* cpath)
 {
 	if(g_aca != NULL){
@@ -70,16 +89,19 @@ int LoadPingbi(const char* cpath)
     }
 	g_fuck_pingbi = (char*)malloc(1);
     while(!feof(fp)) {
+#if 0
         // 读取一行
         fgets(line, sizeof(line), fp);
-        len = strlen(line);
+		len = strlen(line);
 
 		// 末尾总是有一个换行,所以还是处理一下吧.
-		if(line[len] == '\n') {
+		if (line[len] == '\n') {
 			line[len] = '\0';
 			len -= 1;
 		}
-
+#else
+		len = get_line(line, sizeof(line), fp);
+#endif
         // 扩展内存
         g_fuck_pingbi = (char*)realloc(g_fuck_pingbi, size + len + 1);
 		dump_str = g_fuck_pingbi + size;
