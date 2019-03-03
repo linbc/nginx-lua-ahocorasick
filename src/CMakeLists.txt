@@ -23,5 +23,6 @@ include_directories(
 
 add_library(ahocorasick SHARED ${ahocorasick_STAT_SRCS})
 #add_executable(ahocorasick ${ahocorasick_STAT_SRCS})
-SET_TARGET_PROPERTIES(ahocorasick PROPERTIES LINKER_LANGUAGE C)
+set_target_properties(ahocorasick PROPERTIES PREFIX "")
+set_target_properties(ahocorasick PROPERTIES LINKER_LANGUAGE C)
 
