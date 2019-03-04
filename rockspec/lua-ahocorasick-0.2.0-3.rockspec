@@ -1,8 +1,8 @@
 package = "lua-ahocorasick"
-version = "0.2.0-1"
+version = "0.2.0-3"
 source = {
    url = "git+https://github.com/linbc/nginx-lua-ahocorasick.git",
-   tag = "0.2.0-1",
+   tag = "0.2.0-3",
 }
 
 description = {
